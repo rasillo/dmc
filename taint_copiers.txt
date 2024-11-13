@@ -1,0 +1,2 @@
+memcpy ( dest -> [ ], src -> [ dest ] )
+strcpy ( dest -> [ ], src -> [ dest , return ] )

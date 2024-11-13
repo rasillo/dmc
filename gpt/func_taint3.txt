@@ -1,0 +1,337 @@
+abort       -
+abs         -
+access      -
+acos        -
+alarm       -
+asctime_r   -
+asctime     -
+asin        -
+assert      -
+atan2       -
+atan        -
+atexit      -
+atof        -
+atoi        -
+atol        -
+bsearch     -
+btowc       -
+calloc      -
+catclose    -
+catgets     none none none none -> Src
+ceil        -
+chdir       -
+chmod       -
+chown       -
+clearerr    -
+clock_gettime none Src -> none
+clock       -
+close       -
+confstr     none Src none -> none
+cosh        -
+cos         -
+creat       FileSink none -> FileSrc
+ctime64_r   -
+ctime64     -
+ctime_r     -
+ctime       -
+difftime    -
+div         -
+dup2        FileSink FileSink -> FileSrc
+dup         FileSink -> FileSrc
+erfc        -
+erf         -
+execle      Sink Sink Sink Sink -> none
+execlp      FileSink Sink Sink -> none
+execl       FileSink Sink Sink -> none
+execve      FileSink Sink Sink -> none
+execvp      Sink Sink -> none
+execv       FileSink Sink -> none
+_exit       -
+exit        -
+exp         -
+fabs        -
+fclose      -
+fcntl       FileSink none Sink -> none
+fdatasync   -
+fdopen      FileSink none -> FileSrc
+feof        -
+ferror      -
+fflush      -
+fgetc       FileSink -> Src
+fgetpos     -
+fgets       Src none FileSink -> Src
+fgetwc      FileSink -> Src
+fgetws      Src none FileSink -> none
+fileno      FileSink -> FileSrc
+floor       -
+fmod        -
+fopen       FileSink none -> FileSrc
+fork        -> FileSrc
+fpathconf   -
+fprintf     FileSink none Sink -> none
+fputc       Sink FileSink -> none
+fputs       Sink FileSink -> none
+fputwc      Sink FileSink -> none
+fputws      Sink FileSink -> none
+fread       Src none none FileSink -> none
+free        -
+freopen     FileSink none FileSrcAndSink -> FileSrc
+frexp       -
+fscanf      FileSink none Src -> none
+fseek       -
+fsetpos     -
+fstat       FileSink Src -> none
+fsync       -
+ftell       -
+ftruncate   -
+fwprintf    FileSink Sink Sink -> none
+fwrite      Sink none none FileSink -> none
+gamma       -
+getchar     -> Src
+getc        FileSink -> Src
+getcwd      Src none -> Src
+getegid     -
+getenv      none -> Src
+geteuid     -
+getgid      -
+getgroups   none Src -> none
+gethostid   -
+getline     Src none FileSink -> none
+getlogin    -> Src
+getpgrp     -
+getpid      -
+getppid     -
+gets        Src -> Src
+getuid      -
+getwchar    -> Src
+getwc       FileSink -> Src
+gmtime_r    -
+gmtime      -
+hypot       -
+isalnum     -
+isalpha     -
+isascii     -
+isatty      -
+isblank     -
+iscntrl     -
+isdigit     -
+isgraph     -
+islower     -
+isprint     -
+ispunct     -
+isspace     -
+isupper     -
+iswalnum    -
+iswalpha    -
+iswblank    -
+iswcntrl    -
+iswctype    -
+iswdigit    -
+iswgraph    -
+iswlower    -
+iswprint    -
+iswspace    -
+iswupper    -
+iswxdigit   -
+isxdigit    -
+kill        Sink none -> none
+labs        -
+ldexp       -
+ldiv        -
+link        -
+localeconv  -
+localtime_r -
+localtime   -
+log10       -
+longjmp     -
+lseek       -
+malloc      -
+mblen       -
+mbrlen      -
+mbrtowc     -
+mbsinit     -
+mbsrtowcs   none Src none none -> none
+mbstowcs    -
+mbtowc      -
+memchr      -
+memcmp      -
+memcpy      -
+memmove     -
+memset      -
+mkdir       -
+mkfifo      -
+mknod       -
+mktime      -
+modf        -
+nextafterl  -
+nextafter   -
+nexttowardl -
+nexttoward  -
+open        FileSink none none -> FileSrc
+pathconf    -
+pause       -
+perror      Sink -> none
+pipe        FileSrc -> none
+pow         -
+pread       FileSink Src none none -> none
+printf      none Sink -> none
+putchar     Sink -> none
+putc        Sink FileSink -> none
+putenv      Sink -> none
+puts        Sink -> none
+putwchar    Sink -> none
+putwc       Sink FileSink -> none
+pwrite      FileSink Sink none none -> none
+qsort       -
+raise       -
+rand_r      -
+rand        -
+readdir     FileSink -> FileSrc
+readlink    FileSink FileSrc none -> FileSrc
+read        FileSink Src none -> none
+realloc     -
+regcomp     -
+regexec     -
+remove      -
+rename      -
+rewind      -
+rmdir       -
+scanf       none Src -> none
+select      none FileSrcAndSink FileSrcAndSink FileSrcAndSink none -> none
+setbuf      -
+setgid      -
+setjmp      -
+setlocale   -
+setpgid     -
+setsid      -
+setuid      Sink -> none
+setvbuf     -
+sigaction   -
+signal      -
+sigprocmask -
+sinh        -
+sin         -
+sleep       -
+snprintf    none none none Sink -> none
+socket      none none none -> FileSrc
+sprintf     -
+sqrt        -
+srand       -
+sscanf      -
+stat        -
+strcasecmp  -
+strcat      -
+strchr      -
+strcmp      -
+strcoll     -
+strcpy      -
+strcspn     -
+strerror    -
+strftime    -
+strlen      -
+strncasecmp -
+strncat     -
+strncmp     -
+strncpy     -
+strpbrk     -
+strptime    -
+strrchr     -
+strspn      -
+strstr      -
+strtod      -
+strtof      -
+strtok_r    -
+strtok      -
+strtold     none none -> Src
+strtol      -
+strtoul     -
+strxfrm     -
+swprintf    none none none Sink -> none
+swscanf     none none Src -> none
+symlink     -
+sysconf     -
+system      Sink -> none
+tanh        -
+tan         -
+tcdrain     -
+tcflow      -
+tcflush     -
+tcgetattr   FileSink Src -> none
+tcsetattr   FileSink none Sink -> none
+timer_create none Sink Src -> none
+timer_delete -
+timer_settime -
+times       -
+time        -
+tmpfile     -> FileSrc
+tmpnam      FileSrc -> FileSrc
+toascii     -
+tolower     -
+toupper     -
+towctrans   -
+towlower    -
+towupper    -
+umask       -
+uname       Src -> none
+ungetc      -
+ungetwc     -
+unlink      -
+utime       -
+va_arg      -
+va_copy     -
+va_end      -
+va_start    -
+vfprintf    FileSink none Sink -> none
+vfscanf     FileSink none Src -> none
+vfwprintf   FileSink none Sink -> none
+vfwscanf    FileSink none Src -> none
+vprintf     Sink Sink -> none
+vscanf      none Src -> none
+vsnprintf   -
+vsprintf    -
+vsscanf     -
+vswprintf   -
+vswscanf    none none Src -> none
+vwprintf    none Sink -> none
+vwscanf     none Src -> none
+waitpid     -
+wait        -
+wcrtomb     -
+wcscat      -
+wcschr      -
+wcscmp      -
+wcscoll     -
+wcscpy      -
+wcscspn     -
+wcsftime    FileSrc none none none -> none
+wcslen      -
+wcsncat     -
+wcsncmp     -
+wcsncpy     -
+wcspbrk     -
+wcsptime    -
+wcsrchr     -
+wcsrtombs   Src none none none -> none
+wcsspn      -
+wcsstr      -
+wcstod      -
+wcstof      -
+wcstok      -
+wcstold     -
+wcstol      -
+wcstombs    -
+wcstoul     -
+wcsxfrm     -
+wctob       -
+wctomb      -
+wctrans     -
+wctype      -
+wcwidth     -
+wmemchr     -
+wmemcmp     -
+wmemcpy     -
+wmemmove    -
+wmemset     -
+wprintf     none Sink -> none
+write       FileSink Sink none -> none
+wscanf      none Src -> none

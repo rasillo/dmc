@@ -46,9 +46,6 @@ list(APPEND CMAKE_PREFIX_PATH "${LLVM_INSTALL_DIR}/lib/cmake/llvm/")
 find_package(LLVM REQUIRED CONFIG)
 include_directories(${LLVM_INCLUDE_DIRS})
 
-add_library(CondMerge MODULE condmerge.cpp)
-add_library(ReplaceCalls MODULE ReplaceCalls.cpp)
-add_library(ElideFunctions MODULE ElideFunctions.cpp)
 add_library(Taint MODULE taint.cpp)
 
 if (APPLE)

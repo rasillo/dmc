@@ -41,18 +41,33 @@ import argparse
 from collections import OrderedDict, defaultdict
 stop = pdb.set_trace
 
-if not os.environ.get("OPENAI_API_KEY"):
-    print("Error: Missing environment variable.  " + API_key_help)
-    sys.exit(1)
 
-openai_client = None
-if openai_client is None:
-    from openai import OpenAI
-    openai_client = OpenAI(
-        api_key=os.environ.get("OPENAI_API_KEY"),
-    )
-
-
+def set_openai_or_ollama(user_llm_input):
+    if user_llm_input == "1":
+        if not os.environ.get("OPENAI_API_KEY"):
+            print("Error: Missing environment variable.  " + API_key_help) # ? What is that API_key_help for?
+            sys.exit(1)
+        else:
+            openai_client = None
+            if openai_client is None:
+                from openai import OpenAI
+                openai_client = OpenAI(
+                    api_key=os.environ.get("OPENAI_API_KEY"),
+                )
+                messages = [
+                    {"role": "system", "content": "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.\n" + "Knowledge cutoff: 2021-09\n" + "Current date: 2024-12"},
+                ]
+                return ["OpenAI",messages,openai_client]
+    elif user_llm_input == "2":
+        messages = [
+                        {"role": "system", "content": "You are Llama3.2, a large language model trained by Meta, based on the llama 3 architecture.\n" + 
+                         "Knowledge cutoff: 2023-12\n" +
+                         + "Current date: 2024-12"},
+                    ]
+        return ["Ollama",messages]
+    else:
+        print("Error: Invalid CLI input option. Closing.")
+        sys.exit(1)
 
 prompt = (
 """
@@ -120,6 +135,7 @@ def parse_args():
 def main():
     global cmdline_args
     cmdline_args = parse_args()
+    initialized_agent_results = set_openai_or_ollama(input("Select an LLM source:\n1. OpenAI\n2. Ollama\n"))
     func_list = None
     if "." in cmdline_args.func_list:
         func_list = json.loads(read_whole_file(cmdline_args.func_list))
@@ -127,10 +143,13 @@ def main():
         func_list = cmdline_args.func_list.split()
     for func_name in func_list:
         print(func_name)
-        ask_func(func_name)
+        ask_func(func_name,initialized_agent_results)
     print_progress("Done!")
 
-def ask_func(func_name):
+""" func_name: used by calling function
+    initialized_agent_results: global variable determined at runtime (yes it's dirty but it works)
+"""
+def ask_func(func_name,initialized_agent_results):
     global cmdline_args
     filename = cmdline_args.out_dir + "/" + func_name + ".txt"
     if os.path.isfile(filename):

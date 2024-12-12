@@ -35,12 +35,15 @@
 
 import os, sys, time
 import openai
+from ollama import chat
+from ollama import ChatResponse
 import pdb
 import re, json
 import argparse
 from collections import OrderedDict, defaultdict
 stop = pdb.set_trace
 
+HARDCODED_OLLAMA_MODEL = "llama3.2" # TODO this needs to be added into set_openai_or_ollama or somewhere else; but for now let's just see if it works.
 
 def set_openai_or_ollama(user_llm_input):
     if user_llm_input == "1":
@@ -126,7 +129,7 @@ def print_progress(msg):
     print("[%6.2f sec] %s" % (elapsed_time, msg))
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Asks GPT about sources and sinks')
+    parser = argparse.ArgumentParser(description='Asks the LLM about sources and sinks')
     parser.add_argument("func_list", type=str, help="List of functions (either the name of a JSON file or a space-separated list of functions)")
     parser.add_argument("out_dir", type=str, help="Directory to write output files")
     cmdline_args = parser.parse_args()
@@ -150,26 +153,35 @@ def main():
     initialized_agent_results: global variable determined at runtime (yes it's dirty but it works)
 """
 def ask_func(func_name,initialized_agent_results):
+
+    llm_client_type=initialized_agent_results[0]
+    llm_message_buffer=initialized_agent_results[1]
+
     global cmdline_args
     filename = cmdline_args.out_dir + "/" + func_name + ".txt"
     if os.path.isfile(filename):
         print("Answer file already exists for %s!" % func_name)
         return
-    messages = [
-        {"role": "system", "content": "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.\n" + 
-                                      "Knowledge cutoff: 2021-09\n" + "Current date: 2023-09-09"},
-        {"role": "user", "content": prompt.replace("$FUNC_NAME", func_name)},
-    ]
+    llm_message_buffer.append({"role": "user", "content": prompt.replace("$FUNC_NAME", func_name)})
     print_progress("Asking about %s..." % func_name)
 
-    chat_completion = openai_client.chat.completions.create(
-        model="gpt-4-turbo-preview",
-        messages=messages)
 
-    print(chat_completion)
-    print("="*78)
-    answer = chat_completion.choices[0].message.content
-    write_file(filename=filename, content=answer+"\n")
+    # TODO lots of code is repeated here right now; that's kinda painful. Need to rework the output into its own function determined by llm_client_type.
+    if llm_client_type == "OpenAI":
+        llm_client=initialized_agent_results[2]
+        chat_completion = llm_client.chat.completions.create(
+        model="gpt-4-turbo-preview",
+        messages=llm_message_buffer)
+        print(chat_completion)
+        print("="*78)
+        answer = chat_completion.choices[0].message.content
+        write_file(filename=filename, content=answer+"\n")
+    elif llm_client_type == "Ollama":
+        chat_completion: ChatResponse = chat(model=HARDCODED_OLLAMA_MODEL, messages=llm_message_buffer)
+        print(chat_completion)
+        print("="*78)
+        answer = chat_completion.message.content
+        write_file(filename=filename, content=answer+"\n")
 
 
 program_start_time = time.time()

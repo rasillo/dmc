@@ -34,7 +34,7 @@
 # </legal>
 
 import os, sys, time
-import openai
+from openai import OpenAI
 from ollama import chat
 from ollama import ChatResponse
 import pdb
@@ -53,7 +53,6 @@ def set_openai_or_ollama(user_llm_input):
         else:
             openai_client = None
             if openai_client is None:
-                from openai import OpenAI
                 openai_client = OpenAI(
                     api_key=os.environ.get("OPENAI_API_KEY"),
                 )

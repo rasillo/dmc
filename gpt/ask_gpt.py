@@ -46,6 +46,16 @@ stop = pdb.set_trace
 HARDCODED_OLLAMA_MODEL = "llama3.2" # TODO this needs to be added into set_openai_or_ollama or somewhere else; but for now let's just see if it works.
 
 def set_openai_or_ollama(user_llm_input):
+    """
+    Sets the Ollama model for GPT interaction.
+
+    This function determines which Large Language Model (LLM) to use based on the user's input.
+    It checks for the presence of an environment variable `OPENAI_API_KEY` and sets up a connection to OpenAI if necessary.
+    If no API key is provided, it prints an error message and exits the program.
+
+    Returns:
+        A tuple containing the LLM type ("OpenAI" or "Ollama"), a list of messages to send to the LLM, and the initialized LLM client object (if applicable).
+    """
     if user_llm_input == "1":
         if not os.environ.get("OPENAI_API_KEY"):
             print("Error: Missing environment variable.  " + API_key_help) # ? What is that API_key_help for?
@@ -115,19 +125,73 @@ If you do not recognize the asked-about function, then instead of answering as a
 
 
 def read_whole_file(filename):
+    """
+    Reads the entire contents of a file into memory.
+
+    Args:
+        filename: The path to the file to be read.
+
+    Returns:
+        str: The contents of the file as a single string.
+
+    Raises:
+        FileNotFoundError: If the specified file does not exist.
+        PermissionError: If the program lacks permission to read the file.
+    """
     with open(filename, 'r') as the_file:
         return the_file.read()
 
-def write_file(filename, content):
+def write_file(filename, content: str) -> None:
+    """
+    Writes the specified content to a file.
+
+    Args:
+        filename: The path to the file where the content will be written.
+        content (str): The text to be written to the file.
+
+    Raises:
+        FileNotFoundError: If the specified file does not exist.
+        PermissionError: If the program lacks permission to write to the file.
+    """
     with open(filename, 'w') as file:
         file.write(content)
 
 
-def print_progress(msg):
+def print_progress(msg: str) -> None:
+    """
+    Prints the elapsed time and a progress message to the console.
+
+    Args:
+        msg (str): The message to be printed along with the elapsed time.
+
+    Returns:
+        None
+
+    Notes:
+        This function calculates the elapsed time since the program started running.
+    """
+    
     elapsed_time = time.time() - program_start_time
     print("[%6.2f sec] %s" % (elapsed_time, msg))
 
 def parse_args():
+    """
+    Parses command-line arguments for the LLM interaction.
+
+    This function is responsible for extracting relevant information from the command-line interface,
+    including the list of functions to interact with, and the output directory for saving results.
+
+    Args:
+        None (command-line arguments are parsed and returned as an `argparse.Namespace` object)
+
+    Returns:
+        cmdline_args (Namespace): An object containing the parsed command-line arguments
+            - func_list (str): The list of functions to interact with (either a single JSON file or a space-separated list)
+            - out_dir (str): The directory to write output files
+
+    Notes:
+        This function uses the `argparse` library to parse and validate the command-line arguments.
+    """
     parser = argparse.ArgumentParser(description='Asks the LLM about sources and sinks')
     parser.add_argument("func_list", type=str, help="List of functions (either the name of a JSON file or a space-separated list of functions)")
     parser.add_argument("out_dir", type=str, help="Directory to write output files")
@@ -148,44 +212,85 @@ def main():
         ask_func(func_name,initialized_agent_results)
     print_progress("Done!")
 
-""" func_name: used by calling function
-    initialized_agent_results: global variable determined at runtime (yes it's dirty but it works)
-"""
-def ask_func(func_name,initialized_agent_results):
+def ask_func(func_name, initialized_agent_results):
+    """
+    Asks the LLM about a specific function and writes the answer to a file.
 
-    llm_client_type=initialized_agent_results[0]
-    llm_message_buffer=initialized_agent_results[1]
+    This function is responsible for sending a message to the LLM client (either OpenAI or Ollama),
+    receiving the response, and writing it to a file. It also handles cases where an output file
+    already exists for the given function name.
+
+    Args:
+        func_name (str): The name of the function to ask about.
+        initialized_agent_results (list): A list containing information about the LLM client,
+            including its type, message buffer, and connection details (if applicable).
+
+    Returns:
+        None
+
+    Notes:
+        This function uses the `initialized_agent_results` object to determine the LLM client type
+        and connection details. It also relies on the `cmdline_args` object, which is imported globally.
+
+    Raises:
+        ValueError: If the LLM client type is not supported.
+    """
+    llm_client_type = initialized_agent_results[0]
+    llm_message_buffer = initialized_agent_results[1]
 
     global cmdline_args
     filename = cmdline_args.out_dir + "/" + func_name + ".txt"
     if os.path.isfile(filename):
         print("Answer file already exists for %s!" % func_name)
         return
+
+    # Send the message to the LLM client and receive the response
     llm_message_buffer.append({"role": "user", "content": prompt.replace("$FUNC_NAME", func_name)})
     print_progress("Asking about %s..." % func_name)
 
-
-    # TODO lots of code is repeated here right now; that's kinda painful. Need to rework the output into its own function determined by llm_client_type.
     if llm_client_type == "OpenAI":
-        llm_client=initialized_agent_results[2]
+        llm_client = initialized_agent_results[2]
         chat_completion = llm_client.chat.completions.create(
             model="gpt-4-turbo-preview",
             messages=llm_message_buffer)
+        # Write the response to a file
         write_llm_output(chat_completion=chat_completion,
                          filename=filename,
                          llm_client_type=llm_client_type,)
     elif llm_client_type == "Ollama":
         write_llm_output(chat_completion=chat_completion,
-                         filename=filename,llm_client_type=llm_client_type,
+                         filename=filename, llm_client_type=llm_client_type,
                          llm_message_buffer=llm_message_buffer)
         
 
-def write_llm_output(chat_completion,filename,llm_client_type,llm_message_buffer):
+def write_llm_output(chat_completion, filename, llm_client_type, llm_message_buffer):
+    """
+    Writes the LLM response to a file.
+
+    This function takes the chat completion response from the LLM client and writes it to a file.
+    It also includes a header with the LLM model used for the response.
+
+    Args:
+        chat_completion (object): The response from the LLM client.
+        filename (str): The name of the output file.
+        llm_client_type (str): The type of LLM client used (e.g. "OpenAI" or "Ollama").
+        llm_message_buffer (list): A list of messages sent to the LLM client.
+
+    Returns:
+        None
+
+    Notes:
+        This function assumes that `chat_completion` is an object with a `message` attribute containing
+        the response from the LLM client. It also assumes that `filename` and `llm_message_buffer` are
+        valid input values.
+    """
     print(chat_completion)
     print("="*78)
+
     if llm_client_type == "Ollama":
         chat_completion: ChatResponse = chat(model=HARDCODED_OLLAMA_MODEL,          
             messages=llm_message_buffer)
+        # Send a message to Ollama's chat API using whatever model the hardcoded constant defines
         answer = chat_completion.message.content
     elif llm_client_type == "OpenAI":
         answer = chat_completion.choices[0].message.content
@@ -193,6 +298,7 @@ def write_llm_output(chat_completion,filename,llm_client_type,llm_message_buffer
         print("Error in write_llm_output: unknown llm_client_type")
         sys.exit(1)
 
+    # Write the response to a file, appending a newline character for formatting
     write_file(filename=filename, content=answer+"\n")
 
 program_start_time = time.time()

@@ -169,19 +169,31 @@ def ask_func(func_name,initialized_agent_results):
     if llm_client_type == "OpenAI":
         llm_client=initialized_agent_results[2]
         chat_completion = llm_client.chat.completions.create(
-        model="gpt-4-turbo-preview",
-        messages=llm_message_buffer)
-        print(chat_completion)
-        print("="*78)
-        answer = chat_completion.choices[0].message.content
-        write_file(filename=filename, content=answer+"\n")
+            model="gpt-4-turbo-preview",
+            messages=llm_message_buffer)
+        write_llm_output(chat_completion=chat_completion,
+                         filename=filename,
+                         llm_client_type=llm_client_type,)
     elif llm_client_type == "Ollama":
-        chat_completion: ChatResponse = chat(model=HARDCODED_OLLAMA_MODEL, messages=llm_message_buffer)
-        print(chat_completion)
-        print("="*78)
-        answer = chat_completion.message.content
-        write_file(filename=filename, content=answer+"\n")
+        write_llm_output(chat_completion=chat_completion,
+                         filename=filename,llm_client_type=llm_client_type,
+                         llm_message_buffer=llm_message_buffer)
+        
 
+def write_llm_output(chat_completion,filename,llm_client_type,llm_message_buffer):
+    print(chat_completion)
+    print("="*78)
+    if llm_client_type == "Ollama":
+        chat_completion: ChatResponse = chat(model=HARDCODED_OLLAMA_MODEL,          
+            messages=llm_message_buffer)
+        answer = chat_completion.message.content
+    elif llm_client_type == "OpenAI":
+        answer = chat_completion.choices[0].message.content
+    else:
+        print("Error in write_llm_output: unknown llm_client_type")
+        sys.exit(1)
+
+    write_file(filename=filename, content=answer+"\n")
 
 program_start_time = time.time()
 main()
